@@ -16,28 +16,28 @@ hr { border: 1.5px solid #AF0A26; }
 </style>
 """, unsafe_allow_html=True)
 
-# ---- WINDOWS DATA FOLDER PATH ----
-data_folder = r"C:\Users\72774\OneDrive - Bain\Cost-Dashboard\data"
+# ---- DATA FOLDER PATH (Cross-platform compatible) ----
+data_folder = "data"
 
 # ---- READ ALL DATA ----
 @st.cache_data(show_spinner=False)
 def load_data():
     # Azure
-    az = pd.read_excel(f'{data_folder}\\Azure_Resource_Subscription_Cost_Estimate.xlsx')
+    az = pd.read_excel(f'{data_folder}/Azure_Resource_Subscription_Cost_Estimate.xlsx')
     az = az[az['name'] != "SUBSCRIPTION TOTAL"]  # Remove subtotal rows
     az_group = az.groupby(['subscriptionName'], as_index=False)['Service total'].sum()
     az_group['Provider'] = 'Azure'
     az_group = az_group.rename(columns={'subscriptionName': 'Account/Project', 'Service total':'Cost Saved'})
     
     # GCP
-    gcp = pd.read_excel(f'{data_folder}\\GCP_Resource_Project_Cost_Grouped.xlsx')
+    gcp = pd.read_excel(f'{data_folder}/GCP_Resource_Project_Cost_Grouped.xlsx')
     gcp = gcp[gcp['CLOUD_RESOURCE.Name'] != "PROJECT TOTAL"]
     gcp_group = gcp.groupby(['SUBSCRIPTION.Name'], as_index=False)['Service total'].sum()
     gcp_group['Provider'] = 'GCP'
     gcp_group = gcp_group.rename(columns={'SUBSCRIPTION.Name': 'Account/Project', 'Service total':'Cost Saved'})
     
     # AWS (sheet auto-detects account col, see note)
-    aws = pd.read_excel(f'{data_folder}\\AWS_Merged.costs.xlsx')
+    aws = pd.read_excel(f'{data_folder}/AWS_Merged.costs.xlsx')
     acct_col = [col for col in aws.columns if 'account' in col.lower()][0]
     cost_col = [col for col in aws.columns if 'service total' in col.lower() or 'cost' in col.lower()][0]
     aws_group = aws.groupby([acct_col], as_index=False)[cost_col].sum()
