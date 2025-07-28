@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from typing import Dict, Any
 
 # ---- BAIN COLORS ----
 BAIN_RED = "#AF0A26"
@@ -48,7 +49,9 @@ acct_col = [col for col in aws.columns if 'account' in col.lower()][0]
 cost_col = [col for col in aws.columns if 'service total' in col.lower() or 'cost' in col.lower()][0]
 aws_group = aws.groupby([acct_col], as_index=False)[cost_col].sum()
 aws_group['Provider'] = 'AWS'
-aws_group = aws_group.rename(columns={acct_col: 'Account/Project', cost_col: 'Cost Saved'})
+# Use rename with explicit column mapping to avoid type issues
+rename_dict = {acct_col: 'Account/Project', cost_col: 'Cost Saved'}
+aws_group = aws_group.rename(columns=rename_dict)
 all_data = pd.concat([az_group, gcp_group, aws_group], ignore_index=True)
 
 # ---- HEADER ----
