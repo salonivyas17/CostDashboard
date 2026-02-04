@@ -1,4 +1,10 @@
-streamlit
+fastapi
+uvicorn
+gunicorn
 pandas
-plotly
+numpy
 openpyxl
+python-multipart
+sqlalchemy
+psycopg2-binary
+azure-storage-blob
